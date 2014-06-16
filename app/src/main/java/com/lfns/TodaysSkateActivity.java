@@ -3,6 +3,7 @@ package com.lfns;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
@@ -13,6 +14,9 @@ import android.webkit.WebView;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import com.lfns.alarms.FridayAlarm;
+import com.lfns.alarms.SundayAlarm;
+import com.lfns.alarms.WednesdayAlarm;
 import com.lfns.skateQueries.SkateQuery;
 import com.lfns.alarms.AlarmService;
 import com.lfns.util.QueryUrl;
@@ -56,9 +60,23 @@ public class TodaysSkateActivity extends ActionBarActivity {
 
         alarmService = new AlarmService(this.getApplicationContext());
         SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
+
         if (sharedPreferences.getBoolean("alarms_configured", false)) {
             load();
-            this.saveStateConfigureAlarms(null);
+//            alarmService.startSundayAlarm(true);
+//            alarmService.startFridayAlarm(true);
+//            alarmService.startWednesdayAlarm(true);
+//            alarmService.startAlarm(new SundayAlarm(), true);
+//            alarmService.startAlarm(new WednesdayAlarm(), true);
+//            alarmService.startAlarm(new FridayAlarm(), true);
+            new SundayAlarm().setAlarm(sundayBox.isChecked(), this.getApplicationContext());
+            new WednesdayAlarm().setAlarm(wednesdayBox.isChecked(), this.getApplicationContext());
+            new FridayAlarm().setAlarm(fridayBox.isChecked(), this.getApplicationContext());
+            alarmService.startStateWiper();
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean("alarms_configured", true);
+            editor.commit();
         }
     }
 
@@ -85,21 +103,45 @@ public class TodaysSkateActivity extends ActionBarActivity {
     }
 
     public void saveStateConfigureAlarms(View v) {
-        SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean("sunday", sundayBox.isChecked());
-        editor.putBoolean("wednesday", wednesdayBox.isChecked());
-        editor.putBoolean("friday", fridayBox.isChecked());
-        editor.putBoolean("alarms_configured", true);
-        editor.commit();
-        alarmService.startAlarms(sundayBox.isChecked(), wednesdayBox.isChecked(), fridayBox.isChecked());
+        final Context context = this.getApplicationContext();
+        AsyncTask<String, Integer, String[]> task = new AsyncTask<String, Integer, String[]>() {
+            @Override
+            protected String[] doInBackground(String... strings) {
+                SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
+                boolean oldSunday = sharedPreferences.getBoolean("sunday", true);
+                boolean oldWednesday = sharedPreferences.getBoolean("sunday", true);
+                boolean oldFriday = sharedPreferences.getBoolean("sunday", true);
+
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putBoolean("sunday", sundayBox.isChecked());
+                editor.putBoolean("wednesday", wednesdayBox.isChecked());
+                editor.putBoolean("friday", fridayBox.isChecked());
+                editor.commit();
+
+                if (oldSunday != sundayBox.isChecked()) {
+                    //alarmService.startAlarm(new SundayAlarm(), sundayBox.isChecked());
+                    new SundayAlarm().setAlarm(sundayBox.isChecked(), context);
+                }
+                if (oldWednesday != wednesdayBox.isChecked()) {
+                    new WednesdayAlarm().setAlarm(wednesdayBox.isChecked(), context);
+                }
+                if (oldFriday != fridayBox.isChecked()) {
+                    new FridayAlarm().setAlarm(fridayBox.isChecked(), context);
+                }
+                alarmService.startStateWiper();
+
+                return null;
+            }
+        };
+
+        task.execute();
     }
 
     private void load() {
         SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
-        sundayBox.setChecked(sharedPreferences.getBoolean("sunday", false));
-        wednesdayBox.setChecked(sharedPreferences.getBoolean("wednesday", false));
-        fridayBox.setChecked(sharedPreferences.getBoolean("friday", false));
+        sundayBox.setChecked(sharedPreferences.getBoolean("sunday", true));
+        wednesdayBox.setChecked(sharedPreferences.getBoolean("wednesday", true));
+        fridayBox.setChecked(sharedPreferences.getBoolean("friday", true));
     }
 
     @Override

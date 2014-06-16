@@ -27,6 +27,12 @@ public class WednesdayAlarm extends AlarmReceiver {
     public static Calendar getStaticSkateTime() {
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(System.currentTimeMillis());
+        // If we are past skate time of today do not generate a notification
+        if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.WEDNESDAY) {
+            if (calendar.get(Calendar.HOUR_OF_DAY) > 20) {
+                calendar.add(Calendar.DATE, 7);
+            }
+        }
         while (calendar.get(Calendar.DAY_OF_WEEK) != Calendar.WEDNESDAY) {
             calendar.add(Calendar.DATE, 1);
         }

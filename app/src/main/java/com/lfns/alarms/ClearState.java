@@ -6,10 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.lfns.alarms.AlarmReceiver;
-import com.lfns.skateQueries.SkateQuery;
-
-import java.util.Calendar;
 
 public class ClearState extends BroadcastReceiver {
 
