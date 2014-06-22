@@ -3,12 +3,15 @@ package com.lfns;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Html;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
 import android.widget.CheckBox;
@@ -41,6 +44,7 @@ public class TodaysSkateActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.i(this.getClass().getName(), "onCreate");
         setContentView(R.layout.todays_skate);
         skateStatus = (TextView) findViewById(R.id.skateStatus);
         todayText = (TextView) findViewById(R.id.today);
@@ -55,20 +59,11 @@ public class TodaysSkateActivity extends ActionBarActivity {
         webView.getSettings().setBuiltInZoomControls(true);
         webView.loadUrl(Util.getUrlForToday());
 
-        QueryUrlWithUpdates qu = new QueryUrlWithUpdates(Util.getQueryHandlerForToday());
-        qu.execute("");
-
         alarmService = new AlarmService(this.getApplicationContext());
         SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
 
         if (sharedPreferences.getBoolean("alarms_configured", false)) {
             load();
-//            alarmService.startSundayAlarm(true);
-//            alarmService.startFridayAlarm(true);
-//            alarmService.startWednesdayAlarm(true);
-//            alarmService.startAlarm(new SundayAlarm(), true);
-//            alarmService.startAlarm(new WednesdayAlarm(), true);
-//            alarmService.startAlarm(new FridayAlarm(), true);
             new SundayAlarm().setAlarm(sundayBox.isChecked(), this.getApplicationContext());
             new WednesdayAlarm().setAlarm(wednesdayBox.isChecked(), this.getApplicationContext());
             new FridayAlarm().setAlarm(fridayBox.isChecked(), this.getApplicationContext());
@@ -78,6 +73,7 @@ public class TodaysSkateActivity extends ActionBarActivity {
             editor.putBoolean("alarms_configured", true);
             editor.commit();
         }
+
     }
 
     public class QueryUrlWithUpdates extends QueryUrl {
@@ -86,8 +82,11 @@ public class TodaysSkateActivity extends ActionBarActivity {
         }
 
         protected void onPostExecute(String[] data) {
-            skateStatus.setText(Html.fromHtml(data[1]));
-            todayText.setText("Next Skate is:");
+            if (data[1].equals("")) {
+                skateStatus.setText("No skate :-(");
+            } else {
+                skateStatus.setText(Html.fromHtml(data[1]));
+            }
         }
     }
 
@@ -97,9 +96,20 @@ public class TodaysSkateActivity extends ActionBarActivity {
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        Log.i(this.getClass().getName(), "onStart");
+        skateStatus.setText("Loading skate...");
+
+        QueryUrlWithUpdates qu = new QueryUrlWithUpdates(Util.getQueryHandlerForToday());
+        qu.execute("");
+
+        load();
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
-        load();
     }
 
     public void saveStateConfigureAlarms(View v) {
@@ -109,8 +119,8 @@ public class TodaysSkateActivity extends ActionBarActivity {
             protected String[] doInBackground(String... strings) {
                 SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
                 boolean oldSunday = sharedPreferences.getBoolean("sunday", true);
-                boolean oldWednesday = sharedPreferences.getBoolean("sunday", true);
-                boolean oldFriday = sharedPreferences.getBoolean("sunday", true);
+                boolean oldWednesday = sharedPreferences.getBoolean("wednesday", true);
+                boolean oldFriday = sharedPreferences.getBoolean("friday", true);
 
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putBoolean("sunday", sundayBox.isChecked());
@@ -135,6 +145,12 @@ public class TodaysSkateActivity extends ActionBarActivity {
         };
 
         task.execute();
+    }
+
+    public void viewWeather(View v) {
+        Uri uriUrl = Uri.parse("http://forecast.io/#/f/51.5075,-0.1633");
+        Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+        startActivity(launchBrowser);
     }
 
     private void load() {

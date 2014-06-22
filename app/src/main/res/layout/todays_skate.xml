@@ -28,18 +28,21 @@
         android:layout_alignParentStart="true"
         android:layout_below="@+id/today"
         android:layout_toLeftOf="@+id/sundayBox"
-        android:height="100dp" />
+        android:height="250dp"
+        android:layout_alignBottom="@+id/fridayBox" />
 
     <WebView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/webView"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_below="@+id/skateStatus" />
+        android:layout_below="@+id/skateStatus"
+        android:layout_above="@+id/weatherButton"
+        android:clickable="false"
+        android:longClickable="false" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -52,7 +55,9 @@
         android:layout_alignRight="@+id/webView"
         android:layout_alignEnd="@+id/webView"
         android:layout_alignLeft="@+id/wednesdayBox"
-        android:layout_alignStart="@+id/wednesdayBox" />
+        android:layout_alignStart="@+id/wednesdayBox"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -62,7 +67,9 @@
         android:onClick="saveStateConfigureAlarms"
         android:layout_below="@+id/sundayBox"
         android:layout_alignRight="@+id/webView"
-        android:layout_alignEnd="@+id/webView" />
+        android:layout_alignEnd="@+id/webView"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -72,6 +79,17 @@
         android:onClick="saveStateConfigureAlarms"
         android:layout_below="@+id/wednesdayBox"
         android:layout_alignLeft="@+id/wednesdayBox"
-        android:layout_alignStart="@+id/wednesdayBox" />
+        android:layout_alignStart="@+id/wednesdayBox"
+        android:paddingBottom="10dp"
+        android:paddingTop="10dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="View Weather"
+        android:id="@+id/weatherButton"
+        android:onClick="viewWeather"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

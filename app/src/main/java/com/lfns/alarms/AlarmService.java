@@ -11,7 +11,6 @@ import java.util.Calendar;
 
 
 public class AlarmService {
-    private static long REPEAT_FREQUANCY = 1000 * 60 * 1; // Every 5 minutes
     private AlarmManager alarmMgr;
     private Context context;
 

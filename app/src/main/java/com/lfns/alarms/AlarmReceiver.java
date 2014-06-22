@@ -23,6 +23,7 @@ import com.lfns.util.QueryUrl;
 import com.lfns.R;
 import com.lfns.skateQueries.SkateQuery;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.ExecutionException;
@@ -30,7 +31,7 @@ import java.util.concurrent.ExecutionException;
 
 public abstract class AlarmReceiver extends BroadcastReceiver {
 
-    private static long REPEAT_FREQUANCY = 1000 * 60 * 1; // Every 5 minutes
+    private static long REPEAT_FREQUANCY = 1000 * 60 * 60 *  5; // Every 5 minutes
 
     public AlarmReceiver() {
         super();
@@ -49,14 +50,15 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
     public abstract SkateQuery getQuery();
     public abstract int getId();
 
-    private static long getPollTime(Calendar c) {
+    private static Calendar getPollTime(Calendar c) {
         c.add(Calendar.HOUR, -2);
-        return c.getTimeInMillis();
+        c.add(Calendar.MINUTE, -30);
+        return c;
     }
 
     static Calendar moveTimeIfVeryClose(Calendar calendar) {
         long timeDiff = calendar.getTimeInMillis() - new Date().getTime();
-        if (Math.abs(timeDiff) < 1000 * 60 * 60 || timeDiff > 0) {
+        if (Math.abs(timeDiff) < 1000 * 60 * 60 || timeDiff < 0) {
             calendar.add(Calendar.DATE, 7);
         }
         return calendar;
@@ -72,6 +74,7 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
     public void setAlarm(boolean setAlarm, Context pContext) {
         AlarmManager alarmMgr = (AlarmManager) pContext.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(pContext, this.getClass());
+        Log.i(this.getClass().getName(), "Set alarm for "+ this.getClass().getName());
 
         // clear old alarm
         PendingIntent alarm = PendingIntent.getBroadcast(pContext, this.getId(), intent, PendingIntent.FLAG_NO_CREATE);
@@ -82,7 +85,10 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
 
         if (setAlarm) {
             PendingIntent handler = PendingIntent.getBroadcast(pContext, this.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, getPollTime(moveTimeIfVeryClose(this.getSkateTime())), REPEAT_FREQUANCY, handler);
+
+            Calendar pollTime = getPollTime(moveTimeIfVeryClose(this.getSkateTime()));
+            Log.i(this.getClass().getName(), "Set alarm wake up time: "+ new SimpleDateFormat().format(pollTime.getTime()));
+            alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, pollTime.getTimeInMillis(), REPEAT_FREQUANCY, handler);
             // Ensure alarm comes back if phone rebooted.
             ComponentName receiver = new ComponentName(pContext, this.getClass());
             pContext.getPackageManager().setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
@@ -107,18 +113,6 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
             if (alarm != null) {
                 this.setAlarm(true, pContext);
                 // Cancel alarm
-//                AlarmManager alarmMgr = (AlarmManager) pContext.getSystemService(Context.ALARM_SERVICE);
-//                Log.i(this.getClass().getName(), "alarm cancelled");
-//                alarmMgr.cancel(alarm);
-//                alarm.cancel();
-//
-//                // Recreate it for same time next week
-//                long repeat_frequency = 1000 * 60 * 10; //duplicate code in alarmservice
-//                PendingIntent newAlarm = PendingIntent.getBroadcast(pContext, this.getId(), new Intent(pContext, this.getClass()), PendingIntent.FLAG_UPDATE_CURRENT);
-//                Calendar c = this.getSkateTime();
-//                c.add(Calendar.HOUR, -2);
-//                c.add(Calendar.DATE, 7); // Restart This time next week please.
-//                alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, c.getTimeInMillis(), repeat_frequency, newAlarm);
             }
         }
 
@@ -150,7 +144,7 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
                 PendingIntent resultPendingIntent = PendingIntent.getActivity(pContext, 0, new Intent(pContext, TodaysSkateActivity.class), 0);
 
                 NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(pContext)
-                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setSmallIcon(R.drawable.skate_notify1)
                         .setContentTitle("Skate Notification")
                         .setContentText("Skate is " + query[0])
                         .setSound(alarmSound)
