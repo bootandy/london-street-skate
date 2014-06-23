@@ -16,6 +16,7 @@ import android.view.View;
 import android.webkit.WebView;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.lfns.alarms.FridayAlarm;
 import com.lfns.alarms.SundayAlarm;
@@ -33,6 +34,7 @@ public class TodaysSkateActivity extends ActionBarActivity {
     private TextView skateStatus;
     private TextView todayText;
     private AlarmService alarmService;
+    private String mapUrl = "";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -87,6 +89,7 @@ public class TodaysSkateActivity extends ActionBarActivity {
             } else {
                 skateStatus.setText(Html.fromHtml(data[1]));
             }
+            mapUrl = data[2];
         }
     }
 
@@ -151,6 +154,16 @@ public class TodaysSkateActivity extends ActionBarActivity {
         Uri uriUrl = Uri.parse("http://forecast.io/#/f/51.5075,-0.1633");
         Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
         startActivity(launchBrowser);
+    }
+
+    public void viewRoute(View v) {
+        if (!mapUrl.equals("")) {
+            Uri uriUrl = Uri.parse(mapUrl);
+            Intent launchBrowser = new Intent(Intent.ACTION_VIEW, uriUrl);
+            startActivity(launchBrowser);
+        } else {
+            Toast.makeText(getApplicationContext(), "Can't find route", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void load() {

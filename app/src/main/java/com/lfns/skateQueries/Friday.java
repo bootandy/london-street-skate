@@ -19,15 +19,24 @@ public class Friday implements  SkateQuery {
             strollDetailsStr = strollDetails.get(0).text();
         }
 
+        String link = "";
+        Elements strollLink = doc.select("#fp-table-left .skatedate a");
+        if (strollLink == null || strollLink.size() == 0) {
+            strollLink = doc.select("#fp-table-left-go .skatedate a");
+        }
+        if (strollLink != null) {
+            link = strollLink.attr("href");
+        }
+
         Elements strollGo = doc.select("#fp-table-left-go .go");
         if (strollGo.size() > 0) {
-            return new String[] {strollDetailsStr, strollGo.get(0).text()};
+            return new String[] {strollDetailsStr, strollGo.get(0).text(), link};
         }
-        Elements strollNo = doc.select("#fp-table-left-rain .rain"); //guessing
+        Elements strollNo = doc.select("#fp-table-left-rain .rain");
         if (strollNo.size() > 0) {
-            return new String[] {strollDetailsStr, strollNo.get(0).text()};
+            return new String[] {strollDetailsStr, strollNo.get(0).text(), link};
         }
-        return new String[] {"",""};
+        return new String[] {"", "", ""};
     }
 
     public String getName() { return "London Friday Night Skate"; }
