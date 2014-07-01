@@ -6,6 +6,8 @@ import com.lfns.skateQueries.SkateQuery;
 
 import org.jsoup.nodes.Document;
 
+import java.io.IOException;
+
 
 public class QueryUrl extends AsyncTask<String, Integer, String[]> {
 
@@ -16,16 +18,16 @@ public class QueryUrl extends AsyncTask<String, Integer, String[]> {
     }
 
     // may raise: java.net.UnknownHostException on bad url
-    protected String[] doInBackground(String... urlStr) {
+    protected String[] doInBackground(String... urlStr){
         try {
             Document d = Util.callTheUrl(skateQuery.getUrl());
             String[] data = skateQuery.getData(d);
             return data;
-
-        } catch (Exception e) {
+        } catch(Exception e) {
+            //throw new RuntimeException(e);
             e.printStackTrace();
+            return new String[] {"","",""};
         }
-        return new String[] {"", ""};
     }
 
 }
