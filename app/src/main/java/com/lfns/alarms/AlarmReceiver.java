@@ -88,6 +88,7 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
 
             Calendar pollTime = getPollTime(moveTimeIfVeryClose(this.getSkateTime()));
             Log.i(this.getClass().getName(), "Set alarm wake up time: "+ new SimpleDateFormat().format(pollTime.getTime()));
+
             alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, pollTime.getTimeInMillis(), REPEAT_FREQUANCY, handler);
             // Ensure alarm comes back if phone rebooted.
             ComponentName receiver = new ComponentName(pContext, this.getClass());

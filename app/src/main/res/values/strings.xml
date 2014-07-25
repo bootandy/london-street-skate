@@ -3,7 +3,6 @@
 
     <string name="app_name_short">Ldn Skate</string>
     <string name="app_name_full">London Street Skate Notifier</string>
-    <string name="action_settings">Settings</string>
-    <string name="todays_skate">Next Skate is:</string>
+    <string name="todays_skate">Main Page:</string>
 
 </resources>

@@ -5,6 +5,7 @@ import com.lfns.skateQueries.SkateQuery;
 import com.lfns.skateQueries.Sunday;
 import com.lfns.skateQueries.Wednesday;
 
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
@@ -38,7 +39,10 @@ public class Util {
         IOException except = null;
         for (int i = 0; i < 3; i++) {
             try {
-                return Jsoup.connect(url).get();
+                Connection connect = Jsoup.connect(url);
+                connect.header("Cache-Control", "no-cache");
+
+                return connect.get();
             } catch (IOException e) {
                 try {
                     sleep(1000);

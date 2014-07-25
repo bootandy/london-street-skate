@@ -15,6 +15,9 @@ public class Sunday implements SkateQuery {
         if (strollDetails == null || strollDetails.size() == 0) {
             strollDetails = doc.select("#fp-table-right-go .details");
         }
+        if (strollDetails == null || strollDetails.size() == 0) {
+            strollDetails = doc.select("#fp-table-right-rain .details");
+        }
         if (strollDetails != null) {
             strollDetailsStr = strollDetails.get(0).text();
         }
@@ -23,6 +26,9 @@ public class Sunday implements SkateQuery {
         Elements strollLink = doc.select("#fp-table-right .skatedate a");
         if (strollLink == null || strollLink.size() == 0) {
             strollLink = doc.select("#fp-table-right-go .skatedate a");
+        }
+        if (strollLink == null || strollLink.size() == 0) {
+            strollLink = doc.select("#fp-table-right-rain .details");
         }
         if (strollLink != null) {
             link = strollLink.attr("href");

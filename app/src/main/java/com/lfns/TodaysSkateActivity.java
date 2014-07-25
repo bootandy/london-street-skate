@@ -85,7 +85,7 @@ public class TodaysSkateActivity extends ActionBarActivity {
 
         protected void onPostExecute(String[] data) {
             if (data[1].equals("")) {
-                skateStatus.setText("No skate :-(");
+                skateStatus.setText("No news");
             } else {
                 skateStatus.setText(Html.fromHtml(data[1]));
             }

@@ -7,7 +7,7 @@
         android:orderInCategory="100"
         app:showAsAction="never" />
     <item android:id="@+id/action_debugging"
-        android:title="debugging"
+        android:title="Debugging"
         android:orderInCategory="100"
         app:showAsAction="never" />
 </menu>
