@@ -1,5 +1,6 @@
 package com.lfns;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -64,7 +65,9 @@ public class TodaysSkateActivity extends ActionBarActivity {
         alarmService = new AlarmService(this.getApplicationContext());
         SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
 
-        if (sharedPreferences.getBoolean("alarms_configured", false)) {
+        Log.i(this.getClass().getName(), "alarms configured: " + sharedPreferences.getBoolean("alarms_configured", false));
+
+        if (!sharedPreferences.getBoolean("alarms_configured", false)) {
             load();
             new SundayAlarm().setAlarm(sundayBox.isChecked(), this.getApplicationContext());
             new WednesdayAlarm().setAlarm(wednesdayBox.isChecked(), this.getApplicationContext());
@@ -74,6 +77,11 @@ public class TodaysSkateActivity extends ActionBarActivity {
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("alarms_configured", true);
             editor.commit();
+
+            new AlertDialog.Builder(this)
+                    .setTitle("Welcome")
+                    .setMessage("Hello. The app is running!\nClose it and it will run in the background and notify you about skates")
+                    .show();
         }
 
     }

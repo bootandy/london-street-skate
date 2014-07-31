@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException;
 
 public abstract class AlarmReceiver extends BroadcastReceiver {
 
-    private static long REPEAT_FREQUANCY = 1000 * 60 * 60 *  5; // Every 5 minutes
+    private static long REPEAT_FREQUANCY = 1000 * 60 * 60 * 5; // Every 5 minutes
 
     public AlarmReceiver() {
         super();
@@ -58,7 +58,7 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
 
     static Calendar moveTimeIfVeryClose(Calendar calendar) {
         long timeDiff = calendar.getTimeInMillis() - new Date().getTime();
-        if (Math.abs(timeDiff) < 1000 * 60 * 60 || timeDiff < 0) {
+        if (timeDiff < 0) {
             calendar.add(Calendar.DATE, 7);
         }
         return calendar;
@@ -86,8 +86,18 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
         if (setAlarm) {
             PendingIntent handler = PendingIntent.getBroadcast(pContext, this.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-            Calendar pollTime = getPollTime(moveTimeIfVeryClose(this.getSkateTime()));
+            Calendar pollTime = moveTimeIfVeryClose(getPollTime(this.getSkateTime()));
+            //Calendar pollTime = getPollTime(this.getSkateTime());
             Log.i(this.getClass().getName(), "Set alarm wake up time: "+ new SimpleDateFormat().format(pollTime.getTime()));
+
+//            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(pContext)
+//                    .setSmallIcon(R.drawable.skate_notify1)
+//                    .setContentTitle("Skate wake up")
+//                    .setContentText("Skate wakes up" + new SimpleDateFormat().format(pollTime.getTime()));
+//
+//            NotificationManager notificationManager = (NotificationManager) pContext
+//                    .getSystemService(Context.NOTIFICATION_SERVICE);
+//            notificationManager.notify(2, notificationBuilder.build());
 
             alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, pollTime.getTimeInMillis(), REPEAT_FREQUANCY, handler);
             // Ensure alarm comes back if phone rebooted.
@@ -163,22 +173,6 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
         }
 
         // if no network do nothing.
-
-
-
-        //Intent resultIntent = new Intent(pContext, TodaysSkate.class);
-
-        // The stack builder object will contain an artificial back stack for the
-        // started Activity.
-        // This ensures that navigating backward from the Activity leads out of
-        // your application to the Home screen.
-//        TaskStackBuilder stackBuilder = TaskStackBuilder.create(pContext);
-//        // Adds the back stack for the Intent (but not the Intent itself)
-//        stackBuilder.addParentStack(TodaysSkate.class);
-//        // Adds the Intent that starts the Activity to the top of the stack
-//        stackBuilder.addNextIntent(resultIntent);
-
-        //PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 
     }
 
