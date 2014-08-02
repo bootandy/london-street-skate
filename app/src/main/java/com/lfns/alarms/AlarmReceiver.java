@@ -90,19 +90,25 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
             //Calendar pollTime = getPollTime(this.getSkateTime());
             Log.i(this.getClass().getName(), "Set alarm wake up time: "+ new SimpleDateFormat().format(pollTime.getTime()));
 
-//            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(pContext)
-//                    .setSmallIcon(R.drawable.skate_notify1)
-//                    .setContentTitle("Skate wake up")
-//                    .setContentText("Skate wakes up" + new SimpleDateFormat().format(pollTime.getTime()));
-//
-//            NotificationManager notificationManager = (NotificationManager) pContext
-//                    .getSystemService(Context.NOTIFICATION_SERVICE);
-//            notificationManager.notify(2, notificationBuilder.build());
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(pContext)
+                    .setSmallIcon(R.drawable.skate_notify1)
+                    .setContentTitle("Skate wake up")
+                    .setContentText("Skate wakes up" + new SimpleDateFormat().format(pollTime.getTime()));
+
+            NotificationManager notificationManager = (NotificationManager) pContext
+                    .getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify((int)(Math.random()*99999 + 1), notificationBuilder.build());
 
             alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, pollTime.getTimeInMillis(), REPEAT_FREQUANCY, handler);
             // Ensure alarm comes back if phone rebooted.
             ComponentName receiver = new ComponentName(pContext, this.getClass());
             pContext.getPackageManager().setComponentEnabledSetting(receiver, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+
+            // Clear stored skate state
+            SharedPreferences sharedPreferences = pContext.getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("previous_state", "");
+            editor.commit();
         }
     }
 

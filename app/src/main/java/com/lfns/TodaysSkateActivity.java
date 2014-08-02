@@ -23,7 +23,6 @@ import com.lfns.alarms.FridayAlarm;
 import com.lfns.alarms.SundayAlarm;
 import com.lfns.alarms.WednesdayAlarm;
 import com.lfns.skateQueries.SkateQuery;
-import com.lfns.alarms.AlarmService;
 import com.lfns.util.QueryUrl;
 import com.lfns.util.Util;
 
@@ -34,7 +33,6 @@ public class TodaysSkateActivity extends ActionBarActivity {
     private CheckBox fridayBox;
     private TextView skateStatus;
     private TextView todayText;
-    private AlarmService alarmService;
     private String mapUrl = "";
 
     @Override
@@ -62,7 +60,6 @@ public class TodaysSkateActivity extends ActionBarActivity {
         webView.getSettings().setBuiltInZoomControls(true);
         webView.loadUrl(Util.getUrlForToday());
 
-        alarmService = new AlarmService(this.getApplicationContext());
         SharedPreferences sharedPreferences = getSharedPreferences("myPrefs", Context.MODE_PRIVATE);
 
         Log.i(this.getClass().getName(), "alarms configured: " + sharedPreferences.getBoolean("alarms_configured", false));
@@ -72,7 +69,6 @@ public class TodaysSkateActivity extends ActionBarActivity {
             new SundayAlarm().setAlarm(sundayBox.isChecked(), this.getApplicationContext());
             new WednesdayAlarm().setAlarm(wednesdayBox.isChecked(), this.getApplicationContext());
             new FridayAlarm().setAlarm(fridayBox.isChecked(), this.getApplicationContext());
-            alarmService.startStateWiper();
 
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putBoolean("alarms_configured", true);
@@ -116,6 +112,8 @@ public class TodaysSkateActivity extends ActionBarActivity {
         qu.execute("");
 
         load();
+
+        webView.loadUrl(Util.getUrlForToday());
     }
 
     @Override
@@ -149,7 +147,6 @@ public class TodaysSkateActivity extends ActionBarActivity {
                 if (oldFriday != fridayBox.isChecked()) {
                     new FridayAlarm().setAlarm(fridayBox.isChecked(), context);
                 }
-                alarmService.startStateWiper();
 
                 return null;
             }
