@@ -125,11 +125,12 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
         Calendar skateTime = this.getSkateTime();
         skateTime.add(Calendar.MINUTE, -10);
 
+        // Cancel alarm
         if (Calendar.getInstance().after(skateTime)) {
             PendingIntent alarm = PendingIntent.getBroadcast(pContext, this.getId(), pIntent, PendingIntent.FLAG_NO_CREATE);
             if (alarm != null) {
                 this.setAlarm(true, pContext);
-                // Cancel alarm
+                return;
             }
         }
 
