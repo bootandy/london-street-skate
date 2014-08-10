@@ -31,7 +31,7 @@ import java.util.concurrent.ExecutionException;
 
 public abstract class AlarmReceiver extends BroadcastReceiver {
 
-    private static long REPEAT_FREQUANCY = 1000 * 60 * 60 * 5; // Every 5 minutes
+    private static long REPEAT_FREQUANCY = 1000 * 60 * 5; // Every 5 minutes
 
     public AlarmReceiver() {
         super();
@@ -42,9 +42,6 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
 
     }
 
-    private void setupAlarms() {
-        Log.i(this.getClass().getName(), "alarm set on boot");
-    }
 
     public abstract Calendar getSkateTime();
     public abstract SkateQuery getQuery();
@@ -87,17 +84,16 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
             PendingIntent handler = PendingIntent.getBroadcast(pContext, this.getId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
             Calendar pollTime = moveTimeIfVeryClose(getPollTime(this.getSkateTime()));
-            //Calendar pollTime = getPollTime(this.getSkateTime());
             Log.i(this.getClass().getName(), "Set alarm wake up time: "+ new SimpleDateFormat().format(pollTime.getTime()));
 
-            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(pContext)
-                    .setSmallIcon(R.drawable.skate_notify1)
-                    .setContentTitle("Skate wake up")
-                    .setContentText("Skate wakes up" + new SimpleDateFormat().format(pollTime.getTime()));
-
-            NotificationManager notificationManager = (NotificationManager) pContext
-                    .getSystemService(Context.NOTIFICATION_SERVICE);
-            notificationManager.notify((int)(Math.random()*99999 + 1), notificationBuilder.build());
+//            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(pContext)
+//                    .setSmallIcon(R.drawable.skate_notify1)
+//                    .setContentTitle("Skate wake up")
+//                    .setContentText("Skate wakes up" + new SimpleDateFormat().format(pollTime.getTime()));
+//
+//            NotificationManager notificationManager = (NotificationManager) pContext
+//                    .getSystemService(Context.NOTIFICATION_SERVICE);
+//            notificationManager.notify((int)(Math.random()*99999 + 1), notificationBuilder.build());
 
             alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, pollTime.getTimeInMillis(), REPEAT_FREQUANCY, handler);
             // Ensure alarm comes back if phone rebooted.
@@ -135,7 +131,7 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
         }
 
         if (pIntent != null && pIntent.getAction() != null && pIntent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
-            setupAlarms();
+            Log.i(this.getClass().getName(), "alarm set on boot");
             this.setAlarm(true, pContext);
             return;
         }
@@ -149,6 +145,16 @@ public abstract class AlarmReceiver extends BroadcastReceiver {
             query[0] = e.getMessage();
             Log.e(this.getClass().getName(), "Error getting url", e);
         }
+
+        // temp debugging:
+//        NotificationCompat.Builder notificationBuilder2 = new NotificationCompat.Builder(pContext)
+//                .setSmallIcon(R.drawable.skate_notify1)
+//                .setContentTitle("Skate Test")
+//                .setContentText("Skate is " + query[0] + " vs "+ sharedPreferences.getString("previous_state", "") )
+//                .setLights(Color.GRAY, 500, 1000);
+//        NotificationManager notificationManager2 = (NotificationManager) pContext
+//                .getSystemService(Context.NOTIFICATION_SERVICE);
+//        notificationManager2.notify((int)(Math.random()*9999), notificationBuilder2.build());
 
         Log.i(this.getClass().getName(), "response:");
         Log.i(this.getClass().getName(), query[0]);

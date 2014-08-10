@@ -18,6 +18,11 @@ public class Sunday implements SkateQuery {
         if (strollDetails == null || strollDetails.size() == 0) {
             strollDetails = doc.select("#fp-table-right-rain .details");
         }
+        // For some weird reason rain on sunday comes up as the left table
+        if (strollDetails == null || strollDetails.size() == 0) {
+            strollDetails = doc.select("#fp-table-left-rain .details");
+        }
+
         if (strollDetails != null) {
             strollDetailsStr = strollDetails.get(0).text();
         }
@@ -28,7 +33,10 @@ public class Sunday implements SkateQuery {
             strollLink = doc.select("#fp-table-right-go .skatedate a");
         }
         if (strollLink == null || strollLink.size() == 0) {
-            strollLink = doc.select("#fp-table-right-rain .details");
+            strollLink = doc.select("#fp-table-right-rain .skatedate a");
+        }
+        if (strollLink == null || strollLink.size() == 0) {
+            strollLink = doc.select("#fp-table-left-rain .skatedate a");
         }
         if (strollLink != null) {
             link = strollLink.attr("href");
@@ -41,6 +49,10 @@ public class Sunday implements SkateQuery {
         Elements strollNo = doc.select("#fp-table-right-rain .rain");
         if (strollNo.size() > 0) {
             return new String[] {strollDetailsStr, strollNo.get(0).text(), link};
+        }
+        Elements strollNoLeft = doc.select("#fp-table-left-rain .rain");
+        if (strollNoLeft.size() > 0) {
+            return new String[] {strollDetailsStr, strollNoLeft.get(0).text(), link};
         }
         return new String[] {"", "", ""};
     }
